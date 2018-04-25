@@ -24,6 +24,7 @@ var Partida = require('./models/partida');
 var jugadors = [];
 var colors = ["yellow", "red", "green", "blue"];
 var partides = [];
+var partida;
 
 
 // APP USE
@@ -122,32 +123,7 @@ app.post('/login', function (req, res, next) {
                 console.log(partida);
             }
             console.log("Abans d'anar a partida, num de jugadors:" + partida.getJugador.length);
-
-            app.use(sessions({
-                cookieName: 'mySession', // cookie name dictates the key name added to the request object 
-                secret: 'blargadeeblargblarg', // should be a large unguessable string 
-                duration: 24 * 60 * 60 * 1000, // how long the session will stay valid in ms 
-                cookie: {
-                    nom: jugador.email,
-                    color: jugador.color,
-                    path: '/api', // cookie will only be sent to requests under '/api' 
-                    maxAge: 60000, // duration of the cookie in milliseconds, defaults to duration above 
-                    ephemeral: false, // when true, cookie expires when the browser closes 
-                    httpOnly: true, // when true, cookie is not accessible from javascript 
-                    secure: false // when true, cookie will only be sent over SSL. use key 'secureProxy' instead if you handle SSL not in your node process 
-                }
-            }));
-            app.use(function (req, res, next) {
-                if (req.mySession.seenyou) {
-                    res.setHeader('X-Seen-You', 'true');
-                } else {
-                    // setting a property will automatically cause a Set-Cookie response 
-                    // to be sent 
-                    req.mySession.seenyou = true;
-                    res.setHeader('X-Seen-You', 'false');
-                }
-            });
-
+            
             res.redirect('/partida');
         }
     });
@@ -155,11 +131,10 @@ app.post('/login', function (req, res, next) {
 
 /* GET partida. */
 app.get('/partida', function (req, res, next) {
-    var partida = partides[partides.length - 1];
+    partida = partides[partides.length - 1];
     console.log("Partides: " + partides.length);
     console.log("Jugadors a la partida: " + partida.getJugador.length);
 
-    console.log(partida.getJugador[0].color);
 
     if (partida.getJugador.length == 1) {
         partida.crearTaulell();
@@ -182,6 +157,14 @@ function enviarMissatges(socket, data) {
     socket.emit('getColor', data);
     socket.broadcast.emit('getColor', data);
 }
+
+io.sockets.on('connection',function (socket){
+    socket.on('recuperaEmail',function(data) {
+        var currentJugador = partida.getJugador.find(x => x.email = data);
+        //console.log(currentJugador);
+        socket.emit('giveColorBack',currentJugador.color);
+    })
+})
 
 io.sockets.on('connection', function (socket) {
     socket.on('putColor', function (data) {
