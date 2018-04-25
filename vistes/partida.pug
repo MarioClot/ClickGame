@@ -12,10 +12,11 @@ block contingut
             i.icn-logo.material-icons timelapse
             |     esperant nous jugadors
 
-        table
+        table#gameboard
             each item_tr in tr
                 tr
                     each item_td in td
-                        td(id="cell"+ item_tr + "" + item_td) 
+                        td(id="cell"+ item_tr + "" + item_td )
                         
     
+    script(src='/logica.js')

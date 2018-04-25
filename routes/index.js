@@ -85,7 +85,7 @@ router.post('/login', function (req, res, next) {
                 console.log("jugadors parells");
                 console.log(partida);
             }
-            console.log("abans d'anar a partida, num de jugadors:" + partida.getJugador.length)
+            console.log("Abans d'anar a partida, num de jugadors:" + partida.getJugador.length)
             res.redirect('/partida');
 
 
@@ -118,13 +118,12 @@ router.post('/login', function (req, res, next) {
 /* GET partida. */
 router.get('/partida', function (req, res, next) {
     var partida = partides[partides.length - 1];
-    console.log("hola" + partides.length);
-    console.log(partida.getJugador.length);
+    console.log("Partides: " + partides.length);
+    console.log("Jugadors a la partida: "+partida.getJugador.length);
 
     console.log(partida.getJugador[0].color);
     
     if (partida.getJugador.length == 1){
-        console.log("hola");
         partida.crearTaulell();
         
     }
@@ -132,9 +131,9 @@ router.get('/partida', function (req, res, next) {
     //hacer las celdas clickables
     //if click jugador element.style.backgroundColor del td = partida.getJugador[0].color
 
-    
 
-        
+
+    
     res.render('partida', {
         title: 'ClickGame', message: 'benvingut a ClickGame, ', tr: partida.tr, td: partida.td,
         waiting: false,
