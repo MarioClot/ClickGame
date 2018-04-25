@@ -5,7 +5,6 @@ class Jugador{
         this.password = password;
         this.puntuacio = 0;
         this.color = color;
-
     }
 
     toString () {

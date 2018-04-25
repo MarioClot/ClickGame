@@ -1,58 +1,9 @@
-var express = require('express');
-var path = require('path');
-var bodyParser = require('body-parser');
-var mongo = require('mongodb');
-const monk = require('monk')
-
 // Connection URL
-const url = 'localhost:27017/clickgame';
 
-const db = monk(url);
 
-db.then(() => {
-  console.log('Connected correctly to mongoDB')
-})
 
-var app = express();
 
 // Make our db accessible to our router
-app.use(function(req,res,next){
-    req.db = db;
-    next();
-});
-
-// parse incoming requests
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-
-// view engine setup
-app.set('views', path.join(__dirname, 'vistes'));
-app.set('view engine', 'pug');
-
-// serve static files from public
-app.use(express.static(path.join(__dirname, 'public')));
-
-// include routes
-var routes = require('./routes/index');
-app.use('/', routes);
-
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-    var err = new Error('File Not Found');
-    err.status = 404;
-    next(err);
-});
-
-// error handler
-// define as the last app.use callback
-app.use(function (err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
-});
-
 
 
 /*
@@ -125,11 +76,12 @@ app.use('/usuari/:codi', function (req, res, next) {
     res.send(resposta);
   });
 
+*//*
+var servidor = require('http').createServer(app);
+var io = require('socket.io')(servidor);
+servidor.listen(3000);
 */
-var servidor = app.listen(3000, function () {
-    var host = servidor.address().address
-    var port = servidor.address().port
-    console.log("Escoltant en http://%s:%s", host, port)
-});
+
 // qualsevol altre petició retorna 404 not found
 //req i res són els mateixos objectes de NodeJS
+
