@@ -1,0 +1,21 @@
+extends layout
+
+block contingut
+
+    .main.container
+
+        h2 #{message}
+
+        //if waiting
+            br
+            p.hola
+            i.icn-logo.material-icons timelapse
+            |     esperant nous jugadors
+
+        table
+            each item_tr in tr
+                tr
+                    each item_td in td
+                        td(id="cell"+ item_tr + "" + item_td) 
+                        
+    
