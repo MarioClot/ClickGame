@@ -4,13 +4,23 @@ var bodyParser = require('body-parser');
 var mongo = require('mongodb');
 const monk = require('monk');
 var path = require('path');
-var sessions = require("client-sessions");
+//var sessions = require("client-sessions");
+var session = require("express-session");
 
 var app = express();
 
 const url = 'localhost:27017/clickgame';
 const db = monk(url);
 
+app.use(session({
+    resave: true,
+    saveUninitialized: true,
+    secret: 'ABC123',
+    cookie: {
+        name: "ClickGame",
+        maxAge: 60000
+    }
+}));
 
 
 db.then(() => {
@@ -24,7 +34,7 @@ var Partida = require('./models/partida');
 var jugadors = [];
 var colors = ["yellow", "red", "green", "blue"];
 var partides = [];
-var partida;
+//var partida;
 
 
 // APP USE
@@ -110,7 +120,7 @@ app.post('/login', function (req, res, next) {
                 partides.push(partida);
                 console.log("primer jugador");
                 console.log(partida);
-            } else if (partida.getJugador.length != 2) {
+            } else if (partida.getJugador.length != 4) {
                 partida.setJugador = jugador;
                 console.log("jugadors senars");
                 console.log(partida);
@@ -123,6 +133,9 @@ app.post('/login', function (req, res, next) {
                 console.log(partida);
             }
             console.log("Abans d'anar a partida, num de jugadors:" + partida.getJugador.length);
+            io.sockets.on('connection',function(socket){
+                socket.emit("objecteJugador",jugador);
+            })
             
             res.redirect('/partida');
         }
@@ -131,7 +144,7 @@ app.post('/login', function (req, res, next) {
 
 /* GET partida. */
 app.get('/partida', function (req, res, next) {
-    partida = partides[partides.length - 1];
+    var partida = partides[partides.length - 1];
     console.log("Partides: " + partides.length);
     console.log("Jugadors a la partida: " + partida.getJugador.length);
 
@@ -157,14 +170,6 @@ function enviarMissatges(socket, data) {
     socket.emit('getColor', data);
     socket.broadcast.emit('getColor', data);
 }
-
-io.sockets.on('connection',function (socket){
-    socket.on('recuperaEmail',function(data) {
-        var currentJugador = partida.getJugador.find(x => x.email = data);
-        //console.log(currentJugador);
-        socket.emit('giveColorBack',currentJugador.color);
-    })
-})
 
 io.sockets.on('connection', function (socket) {
     socket.on('putColor', function (data) {
