@@ -4,24 +4,11 @@ var bodyParser = require('body-parser');
 var mongo = require('mongodb');
 const monk = require('monk');
 var path = require('path');
-//var sessions = require("client-sessions");
-var session = require("express-session");
 
 var app = express();
 
 const url = 'localhost:27017/clickgame';
 const db = monk(url);
-
-app.use(session({
-    resave: true,
-    saveUninitialized: true,
-    secret: 'ABC123',
-    cookie: {
-        name: "ClickGame",
-        maxAge: 60000
-    }
-}));
-
 
 db.then(() => {
     console.log('Connected correctly to mongoDB')
@@ -171,9 +158,17 @@ function enviarMissatges(socket, data) {
     socket.broadcast.emit('getColor', data);
 }
 
+function enviarPuntuacions(socket,data) {
+    socket.emit('puntuacio',data);
+    socket.broadcast.emit('puntuacio',data);
+}
+
 io.sockets.on('connection', function (socket) {
     socket.on('putColor', function (data) {
         console.log('dades rebudes del client->' + data.id + " - " + data.color);
         enviarMissatges(socket, data);
+    })
+    socket.on('puntuacions',function (data){
+        enviarPuntuacions(socket,data);
     })
 })
